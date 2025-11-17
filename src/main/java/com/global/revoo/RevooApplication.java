@@ -8,5 +8,6 @@ public class RevooApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RevooApplication.class, args);
+        
     }
 }
