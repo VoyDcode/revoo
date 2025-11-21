@@ -2,13 +2,13 @@ package com.global.revoo.config.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,21 +17,27 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    // agora a chave é uma STRING normal, não Base64
     @Value("${security.jwt.secret}")
-    private String secret;
+    private String secretKey;
 
     @Value("${security.jwt.expiration}")
-    private long expirationMillis;
+    private long jwtExpirationMillis;
 
     private SecretKey getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        // converte a string em bytes e usa direto
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // ====== LEITURA DE CLAIMS ======
+    // ====== EXTRAÇÃO DE CLAIMS ======
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -40,8 +46,6 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        // API nova do JJWT 0.12.x:
-        // Jwts.parser() agora retorna um JwtParserBuilder
         return Jwts.parser()
                 .verifyWith(getSignKey())
                 .build()
@@ -50,28 +54,25 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        Date expiration = extractClaim(token, Claims::getExpiration);
-        return expiration.before(new Date());
+        return extractExpiration(token).before(new Date());
     }
 
-    // ====== GERAÇÃO DE TOKEN ======
+    // ====== GERAÇÃO ======
 
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims,
-                                UserDetails userDetails) {
-
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + expirationMillis);
+        Date expiration = new Date(now.getTime() + jwtExpirationMillis);
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .claims(extraClaims)
                 .issuedAt(now)
                 .expiration(expiration)
-                .signWith(getSignKey()) // algoritmo derivado da chave
+                .signWith(getSignKey())
                 .compact();
     }
 

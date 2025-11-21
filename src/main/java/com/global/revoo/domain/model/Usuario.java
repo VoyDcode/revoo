@@ -6,6 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,61 +20,76 @@ public class Usuario implements UserDetails {
     @Column(name = "ID_USUARIO")
     private Long id;
 
-    @Column(name = "NOME_COMPLETO", nullable = false, length = 150)
-    private String nomeCompleto;
+    @Column(name = "NOM_USUARIO", nullable = false, length = 100)
+    private String nome;
 
     @Column(name = "EMAIL", nullable = false, unique = true, length = 120)
     private String email;
 
-    @Column(name = "SENHA_HASH", nullable = false, length = 255)
-    private String senhaHash;
+    @Column(name = "SENHA_HASH", nullable = false, length = 200)
+    private String senha;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "PAPEL", nullable = false, length = 20)
-    private PapelUsuario papel;
+    private PapelUsuario papel = PapelUsuario.USUARIO;
 
-    // Construtores
-    public Usuario() {}
+    @Column(name = "DT_NASC")
+    private LocalDate dataNascimento;
 
-    public Usuario(String nomeCompleto, String email, String senhaHash, PapelUsuario papel) {
-        this.nomeCompleto = nomeCompleto;
-        this.email = email;
-        this.senhaHash = senhaHash;
-        this.papel = papel;
-    }
+    @Column(name = "DT_CRIACAO", insertable = false, updatable = false)
+    private LocalDateTime dataCriacao;
 
-    // Getters e setters "normais"
+    @Column(name = "DT_ATUALIZACAO", insertable = false, updatable = false)
+    private LocalDateTime dataAtualizacao;
+
+    // ====== Getters e setters de domínio ======
+
     public Long getId() { return id; }
 
-    public String getNomeCompleto() { return nomeCompleto; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setNomeCompleto(String nomeCompleto) { this.nomeCompleto = nomeCompleto; }
+    public String getNome() { return nome; }
+
+    public void setNome(String nome) { this.nome = nome; }
 
     public String getEmail() { return email; }
 
     public void setEmail(String email) { this.email = email; }
 
-    public String getSenhaHash() { return senhaHash; }
+    public String getSenha() { return senha; }
 
-    public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
+    public void setSenha(String senha) { this.senha = senha; }
 
     public PapelUsuario getPapel() { return papel; }
 
     public void setPapel(PapelUsuario papel) { this.papel = papel; }
 
-    // Implementação UserDetails
+    public LocalDate getDataNascimento() { return dataNascimento; }
+
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
+
+    public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
+
+    // ====== UserDetails (Spring Security) ======
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // ROLE_ADMIN ou ROLE_USUARIO
         return List.of(new SimpleGrantedAuthority("ROLE_" + papel.name()));
     }
 
     @Override
     public String getPassword() {
-        return senhaHash;
+        return senha;
     }
 
     @Override
     public String getUsername() {
+        // usamos o e-mail como "username" para login
         return email;
     }
 
