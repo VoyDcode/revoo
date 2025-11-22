@@ -20,39 +20,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UsuarioService usuarioService;
 
-    public JwtAuthenticationFilter(JwtService jwtService,
-                                   UsuarioService usuarioService) {
+    public JwtAuthenticationFilter(JwtService jwtService, UsuarioService usuarioService) {
         this.jwtService = jwtService;
         this.usuarioService = usuarioService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        String path = request.getServletPath();
+
+        // Libera o fluxo sem tentar validar token nas rotas de autenticação
+        if (path.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String username;
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7);
+        final String jwt = authHeader.substring(7);
+        String username;
 
         try {
             username = jwtService.extractUsername(jwt);
         } catch (Exception e) {
-            // token inválido -> segue sem autenticar
+            // Token inválido → segue sem autenticar
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (username != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = usuarioService.loadUserByUsername(username);
 

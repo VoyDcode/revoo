@@ -2,6 +2,8 @@ package com.global.revoo.web.controller;
 
 import com.global.revoo.domain.model.Colaborador;
 import com.global.revoo.service.ColaboradorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,40 +11,48 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/colaboradores")
+@RequestMapping("/api/colaboradores")
+@Tag(name = "Colaboradores", description = "CRUD de colaboradores")
 public class ColaboradorController {
 
-    private final ColaboradorService service;
+    private final ColaboradorService colaboradorService;
 
-    public ColaboradorController(ColaboradorService service) {
-        this.service = service;
+    public ColaboradorController(ColaboradorService colaboradorService) {
+        this.colaboradorService = colaboradorService;
     }
 
     @GetMapping
-    public List<Colaborador> listarTodos() {
-        return service.listarTodos();
+    @Operation(summary = "Lista todos os colaboradores")
+    public ResponseEntity<List<Colaborador>> listarTodos() {
+        return ResponseEntity.ok(colaboradorService.listarTodos());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Busca colaborador por id")
     public ResponseEntity<Colaborador> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(service.buscarPorId(id));
+        Colaborador colaborador = colaboradorService.buscarPorId(id);
+        return ResponseEntity.ok(colaborador);
     }
 
     @PostMapping
+    @Operation(summary = "Cria um colaborador")
     public ResponseEntity<Colaborador> criar(@RequestBody Colaborador colaborador) {
-        Colaborador criado = service.criar(colaborador);
+        Colaborador criado = colaboradorService.criar(colaborador);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualiza um colaborador")
     public ResponseEntity<Colaborador> atualizar(@PathVariable Long id,
                                                  @RequestBody Colaborador colaborador) {
-        return ResponseEntity.ok(service.atualizar(id, colaborador));
+        Colaborador atualizado = colaboradorService.atualizar(id, colaborador);
+        return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        service.excluir(id);
+    @Operation(summary = "Remove um colaborador")
+    public ResponseEntity<Void> remover(@PathVariable Long id) {
+        colaboradorService.remover(id);
         return ResponseEntity.noContent().build();
     }
 }

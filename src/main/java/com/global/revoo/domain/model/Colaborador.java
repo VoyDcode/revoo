@@ -1,28 +1,46 @@
 package com.global.revoo.domain.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "COLABORADOR") // 🔁 troque para o nome da tabela real no Oracle
+@Table(name = "COLABORADOR")
 public class Colaborador {
 
     @Id
-    @Column(name = "ID_COLABORADOR") // coluna PK da tabela
-    // Se tiver SEQUENCE no banco:
-    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COLABORADOR_SEQ")
-    // @SequenceGenerator(name = "COLABORADOR_SEQ", sequenceName = "COLABORADOR_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_COLABORADOR")
     private Long id;
 
-    @Column(name = "NOME", nullable = false, length = 100)
-    private String nome;
+    // FK para USUARIO (ID_USUARIO)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ID_USUARIO", nullable = false)
+    private Usuario usuario;
 
-    @Column(name = "EMAIL", nullable = false, length = 150, unique = true)
-    private String email;
+    @Column(name = "MATRICULA", length = 30, unique = true)
+    private String matricula;
 
-    @Column(name = "DEPARTAMENTO", length = 80)
-    private String departamento;
+    @Column(name = "CARGO", length = 60)
+    private String cargo;
 
-    // getters e setters
+    @Column(name = "SETOR", length = 60)
+    private String setor;
+
+    @Column(name = "DT_ADMISSAO")
+    private LocalDate dataAdmissao;
+
+    @Column(name = "DT_DESLIGAMENTO")
+    private LocalDate dataDesligamento;
+
+    // Preenchidas pelas triggers / pelo banco
+    @Column(name = "DT_CRIACAO", insertable = false, updatable = false)
+    private LocalDateTime dataCriacao;
+
+    @Column(name = "DT_ATUALIZACAO", insertable = false, updatable = false)
+    private LocalDateTime dataAtualizacao;
+
+    // Getters e Setters
 
     public Long getId() {
         return id;
@@ -32,27 +50,67 @@ public class Colaborador {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
-    public String getEmail() {
-        return email;
+    public String getMatricula() {
+        return matricula;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
     }
 
-    public String getDepartamento() {
-        return departamento;
+    public String getCargo() {
+        return cargo;
     }
 
-    public void setDepartamento(String departamento) {
-        this.departamento = departamento;
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
+    }
+
+    public String getSetor() {
+        return setor;
+    }
+
+    public void setSetor(String setor) {
+        this.setor = setor;
+    }
+
+    public LocalDate getDataAdmissao() {
+        return dataAdmissao;
+    }
+
+    public void setDataAdmissao(LocalDate dataAdmissao) {
+        this.dataAdmissao = dataAdmissao;
+    }
+
+    public LocalDate getDataDesligamento() {
+        return dataDesligamento;
+    }
+
+    public void setDataDesligamento(LocalDate dataDesligamento) {
+        this.dataDesligamento = dataDesligamento;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
+    public LocalDateTime getDataAtualizacao() {
+        return dataAtualizacao;
+    }
+
+    public void setDataAtualizacao(LocalDateTime dataAtualizacao) {
+        this.dataAtualizacao = dataAtualizacao;
     }
 }
