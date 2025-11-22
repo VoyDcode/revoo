@@ -4,40 +4,38 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "HABITO")
+@Table(name = "CATEGORIA_HABITO")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Habito {
+public class CategoriaHabito {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_HABITO")
+    @Column(name = "ID_CATEGORIA_HABITO")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_CATEGORIA_HABITO", nullable = false)
-    private CategoriaHabito categoria;
-
-    @Column(name = "NOM_HABITO", nullable = false, length = 150)
+    @Column(name = "NOM_CATEGORIA", nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "DES_HABITO", length = 400)
+    @Column(name = "DES_CATEGORIA", length = 400)
     private String descricao;
 
-    @Column(name = "PONTOS_BASE", nullable = false)
-    private Integer pontosBase;
-
     @Column(name = "IND_ATIVO", nullable = false, length = 1)
-    private String ativo; // 'S' ou 'N'
+    private String indicadorAtivo; // 'S' ou 'N'
 
     @Column(name = "DT_CRIACAO", nullable = false)
     private LocalDateTime dataCriacao;
 
     @Column(name = "DT_ATUALIZACAO")
     private LocalDateTime dataAtualizacao;
+
+    @OneToMany(mappedBy = "categoria")
+    private List<Habito> habitos = new ArrayList<>();
 }

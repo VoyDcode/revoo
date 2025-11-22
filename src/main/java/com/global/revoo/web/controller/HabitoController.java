@@ -1,6 +1,6 @@
 package com.global.revoo.web.controller;
 
-import com.global.revoo.domain.enums.CategoriaHabito;
+import com.global.revoo.domain.model.CategoriaHabito;
 import com.global.revoo.service.HabitoService;
 import com.global.revoo.web.dto.habito.HabitoRequest;
 import com.global.revoo.web.dto.habito.HabitoResponse;

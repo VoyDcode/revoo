@@ -9,6 +9,7 @@ import com.global.revoo.domain.repository.HabitoRepository;
 import com.global.revoo.domain.repository.MetaSemanalRepository;
 import com.global.revoo.web.dto.meta.MetaSemanalRequest;
 import com.global.revoo.web.dto.meta.MetaSemanalResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,9 +67,18 @@ public class MetaSemanalService {
         meta.setQuantidadeMeta(request.getQuantidadeMeta());
         meta.setStatus(StatusMeta.ATIVA);
 
-        MetaSemanal salva = metaSemanalRepository.save(meta);
-
-        return toResponse(salva);
+        try {
+            MetaSemanal salva = metaSemanalRepository.save(meta);
+            return toResponse(salva);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage() != null && e.getMessage().contains("UK_META_COLAB_HABITO_SEM")) {
+                throw new IllegalArgumentException(
+                    "Já existe uma meta semanal para este colaborador, hábito e semana de início. " +
+                    "Não é permitido criar metas duplicadas para a mesma semana."
+                );
+            }
+            throw e;
+        }
     }
 
     public void excluir(Long id) {
@@ -92,7 +102,8 @@ public class MetaSemanalService {
         Habito habito = meta.getHabito();
         if (habito != null) {
             response.setIdHabito(habito.getId());
-            response.setTituloHabito(habito.getTitulo());
+            // Usa o campo `nome` da entidade Habito para preencher o título na resposta.
+            response.setTituloHabito(habito.getNome());
         }
 
         response.setSemanaInicio(meta.getSemanaInicio());

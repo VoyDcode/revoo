@@ -1,5 +1,6 @@
 package com.global.revoo.web.dto.meta;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
@@ -18,6 +19,7 @@ public class MetaSemanalRequest {
     private LocalDate semanaInicio;
 
     @NotNull
+    @JsonAlias({"semanaFin", "semanaFim"})
     private LocalDate semanaFim;
 
     @NotNull

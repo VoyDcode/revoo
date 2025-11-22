@@ -1,6 +1,6 @@
 package com.global.revoo.web.dto.habito;
 
-import com.global.revoo.domain.enums.CategoriaHabito;
+import com.global.revoo.domain.model.CategoriaHabito;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

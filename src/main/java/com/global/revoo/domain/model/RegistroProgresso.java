@@ -18,13 +18,13 @@ public class RegistroProgresso {
     @JoinColumn(name = "ID_META_SEMANAL", nullable = false)
     private MetaSemanal metaSemanal;
 
-    @Column(name = "DT_REGISTRO", nullable = false)
+    @Column(name = "DATA_REGISTRO", nullable = false)
     private LocalDate dataRegistro;
 
-    @Column(name = "QTD_PROGRESSO", nullable = false, precision = 8, scale = 2)
+    @Column(name = "QTD_REALIZADA", nullable = false, precision = 8, scale = 2)
     private BigDecimal quantidadeProgresso;
 
-    @Column(name = "OBSERVACAO")
+    @Column(name = "OBS")
     private String observacao;
 
     @Column(name = "DT_CRIACAO", insertable = false, updatable = false)
